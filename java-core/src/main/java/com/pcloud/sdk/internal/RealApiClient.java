@@ -899,8 +899,7 @@ class RealApiClient implements ApiClient {
     private Request createListFolderRequest(long folderId, boolean recursive) {
         HttpUrl.Builder urlBuilder = API_BASE_URL.newBuilder()
                 .addPathSegment("listfolder")
-                .addQueryParameter("folderid", String.valueOf(folderId))
-                .addQueryParameter("noshares", String.valueOf(1));
+                .addQueryParameter("folderid", String.valueOf(folderId));
         if (recursive) {
             urlBuilder.addEncodedQueryParameter("recursive", String.valueOf(1));
         }
