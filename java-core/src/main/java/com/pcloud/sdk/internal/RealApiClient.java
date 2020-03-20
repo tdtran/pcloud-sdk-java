@@ -202,7 +202,7 @@ class RealApiClient implements ApiClient {
             }
         };
 
-        RequestBody compositeBody = new MultipartBody.Builder("--")
+        RequestBody compositeBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", filename, dataBody)
                 .build();
