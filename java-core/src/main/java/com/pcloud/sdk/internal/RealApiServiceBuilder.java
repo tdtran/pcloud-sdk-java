@@ -33,6 +33,7 @@ class RealApiServiceBuilder implements ApiClient.Builder {
     private int writeTimeoutMs;
     private int connectTimeoutMs;
     private long progressCallbackThresholdBytes;
+    private String apiServerHostname;
     private Authenticator authenticator;
 
     RealApiServiceBuilder(OkHttpClient okHttpClient, Executor callbackExecutor, long progressCallbackThresholdBytes, Authenticator authenticator) {
@@ -118,6 +119,12 @@ class RealApiServiceBuilder implements ApiClient.Builder {
     }
 
     @Override
+    public ApiClient.Builder apiServerHostname(String hostname) {
+        this.apiServerHostname = hostname;
+        return this;
+    }
+
+    @Override
     public ApiClient create() {
         return new RealApiClient(this);
     }
@@ -152,6 +159,10 @@ class RealApiServiceBuilder implements ApiClient.Builder {
 
     public long progressCallbackThresholdBytes() {
         return progressCallbackThresholdBytes;
+    }
+
+    public String apiServerHostname() {
+        return apiServerHostname;
     }
 
     public Authenticator authenticator() {

@@ -1060,6 +1060,16 @@ public interface ApiClient {
         Builder progressCallbackThreshold(long bytes);
 
         /**
+         * Specify API server DNS hostname
+         * <p>
+         * If not set, the default hostname api.pcloud.com is used
+         *
+         * @param hostname API server DNS hostname
+         * @return the same {@link Builder} instance
+         */
+        Builder apiServerHostname(String hostname);
+
+        /**
          * Create a new {@link ApiClient} from the provided configuration.
          *
          * @return a new non-null {@link ApiClient} object

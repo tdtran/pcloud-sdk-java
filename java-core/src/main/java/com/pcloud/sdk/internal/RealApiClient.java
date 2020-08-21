@@ -56,8 +56,7 @@ class RealApiClient implements ApiClient {
     private Gson gson;
     private OkHttpClient httpClient;
     private Executor callbackExecutor;
-
-    private static final HttpUrl API_BASE_URL = HttpUrl.parse("https://api.pcloud.com");
+    private HttpUrl apiBaseUrl;
 
     RealApiClient() {
         this(new RealApiServiceBuilder());
@@ -104,6 +103,13 @@ class RealApiClient implements ApiClient {
                 .registerTypeAdapter(RealRemoteFile.class, new RealRemoteFile.InstanceCreator(this))
                 .registerTypeAdapter(RealRemoteFolder.class, new RealRemoteFolder.InstanceCreator(this))
                 .create();
+
+        String hostname = builder.apiServerHostname();
+        if (hostname != null) {
+            apiBaseUrl = HttpUrl.parse("https://" + hostname);
+        } else {
+            apiBaseUrl = HttpUrl.parse("https://api.pcloud.com");
+        }
     }
 
     @Override
@@ -207,7 +213,7 @@ class RealApiClient implements ApiClient {
                 .addFormDataPart("file", filename, dataBody)
                 .build();
 
-        HttpUrl.Builder urlBuilder = API_BASE_URL.newBuilder().
+        HttpUrl.Builder urlBuilder = apiBaseUrl.newBuilder().
                 addPathSegment("uploadfile")
                 .addQueryParameter("folderid", String.valueOf(folderId))
                 .addQueryParameter("renameifexists", String.valueOf(uploadOptions.overrideFile() ? 0 : 1))
@@ -246,7 +252,7 @@ class RealApiClient implements ApiClient {
     @Override
     public Call<Boolean> deleteFile(long fileId) {
         Request request = new Request.Builder()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("deletefile")
                         .build())
                 .get()
@@ -299,7 +305,7 @@ class RealApiClient implements ApiClient {
     }
 
     private Request newDownloadLinkRequest(long fileId, DownloadOptions options) {
-        HttpUrl.Builder urlBuilder = API_BASE_URL.newBuilder().
+        HttpUrl.Builder urlBuilder = apiBaseUrl.newBuilder().
                 addPathSegment("getfilelink")
                 .addQueryParameter("fileid", String.valueOf(fileId));
 
@@ -422,7 +428,7 @@ class RealApiClient implements ApiClient {
         }
 
         Request request = newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("copyfile")
                         .build())
                 .post(builder.build())
@@ -564,7 +570,7 @@ class RealApiClient implements ApiClient {
                 .build();
 
         Request request = newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("renamefile")
                         .build())
                 .post(body)
@@ -602,7 +608,7 @@ class RealApiClient implements ApiClient {
                 .build();
 
         Request request = newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("renamefile")
                         .build())
                 .post(body)
@@ -653,7 +659,7 @@ class RealApiClient implements ApiClient {
                 .build();
 
         return newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("createfolder").build())
                 .post(body)
                 .build();
@@ -687,7 +693,7 @@ class RealApiClient implements ApiClient {
                 .build();
 
         Request request = newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment(recursively ? "deletefolderrecursive" : "deletefolder")
                         .build())
                 .post(body)
@@ -730,7 +736,7 @@ class RealApiClient implements ApiClient {
                 .build();
 
         return newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("renamefolder")
                         .build())
                 .post(body)
@@ -753,7 +759,7 @@ class RealApiClient implements ApiClient {
                 .build();
 
         Request request = newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("renamefolder")
                         .build())
                 .post(body)
@@ -800,7 +806,7 @@ class RealApiClient implements ApiClient {
         }
 
         Request request = newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("copyfolder")
                         .build())
                 .post(builder.build())
@@ -817,7 +823,7 @@ class RealApiClient implements ApiClient {
     @Override
     public Call<UserInfo> getUserInfo() {
         Request request = newRequest()
-                .url(API_BASE_URL.newBuilder()
+                .url(apiBaseUrl.newBuilder()
                         .addPathSegment("userinfo")
                         .build())
                 .get().build();
@@ -893,11 +899,11 @@ class RealApiClient implements ApiClient {
     }
 
     private Request.Builder newRequest() {
-        return new Request.Builder().url(API_BASE_URL);
+        return new Request.Builder().url(apiBaseUrl);
     }
 
     private Request createListFolderRequest(long folderId, boolean recursive) {
-        HttpUrl.Builder urlBuilder = API_BASE_URL.newBuilder()
+        HttpUrl.Builder urlBuilder = apiBaseUrl.newBuilder()
                 .addPathSegment("listfolder")
                 .addQueryParameter("folderid", String.valueOf(folderId));
         if (recursive) {
